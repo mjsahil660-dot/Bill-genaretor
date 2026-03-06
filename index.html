@@ -13,7 +13,7 @@
         .header-title { text-align: center; color: #166534; margin-bottom: 15px; border-bottom: 2px solid #2ecc71; padding-bottom: 10px; }
         #loginSection { text-align: center; margin-top: 50px; }
         .nav-menu { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-btn { flex: 1; padding: 8px; border: none; background: #ddd; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .nav-btn { flex: 1; padding: 10px; border: none; background: #ddd; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
         .nav-btn.active { background: #2ecc71; color: white; }
         .section-title { background: #f8f9fa; padding: 5px 10px; margin: 15px 0 10px; font-weight: bold; color: #27ae60; border-radius: 5px; font-size: 13px; border-left: 4px solid #2ecc71; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 12px; }
@@ -43,6 +43,7 @@
         <button id="btn-calc" class="nav-btn" onclick="showTab('calc')">মাসিক হিসাব</button>
     </div>
 
+    <!-- Tab 1: Bill -->
     <div id="bill" class="tab-content active">
         <label>প্রাইস (৳)</label><input type="number" id="b_price" oninput="calcBill()">
         <label>কোয়ান্টিটি</label><input type="number" id="b_qty" value="1" oninput="calcBill()">
@@ -52,27 +53,49 @@
         <div id="billOutput" style="display:none;"><div class="output-box" id="billResult"></div><button class="main-btn" style="background:#3498db; margin-top:5px;" onclick="copyText('billResult')">কপি করুন</button></div>
     </div>
 
+    <!-- Tab 2: Order Form (Updated Details) -->
     <div id="form" class="tab-content">
         <div class="grid">
-            <input type="text" id="f_name" placeholder="নাম">
-            <input type="text" id="f_phone" placeholder="ফোন">
+            <div><label>জার্সি (পিস)</label><input type="number" id="f_qJ" value="1"></div>
+            <div><label>প্যান্ট (পিস)</label><input type="number" id="f_qP" value="0"></div>
         </div>
+        <div class="grid">
+            <input type="text" id="f_name" placeholder="আপনার নাম">
+            <input type="text" id="f_phone" placeholder="ফোন নাম্বার">
+        </div>
+        <div class="section-title">ডিজাইন ডিটেইলস</div>
         <div class="grid">
             <input type="text" id="f_jname" placeholder="পিছনের নাম">
             <input type="text" id="f_jnum" placeholder="নাম্বার">
         </div>
-        <textarea id="f_note" placeholder="নোট (লোগো/ডিজাইন)" rows="2"></textarea>
+        <div class="grid">
+            <input type="text" id="f_size" placeholder="সাইজ">
+            <input type="text" id="f_hata" placeholder="হাতার ধরণ (হাফ/ফুল)">
+        </div>
+        <input type="text" id="f_gola" placeholder="গোলার ধরণ">
+        
+        <div class="section-title">ঠিকানা</div>
+        <div class="grid">
+            <input type="text" id="f_dist" placeholder="জেলা">
+            <input type="text" id="f_thana" placeholder="থানা">
+        </div>
+        <input type="text" id="f_area" placeholder="এলাকা/মহল্লা">
+        
+        <label>নোট -</label>
+        <textarea id="f_note" placeholder="লোগো বা কাস্টম ডিজাইন নোট..." rows="2"></textarea>
+        
         <button class="main-btn" onclick="genForm()">অর্ডার ফর্ম তৈরি করুন</button>
         <div id="formOutput" style="display:none;"><div class="output-box" id="formResult"></div><button class="main-btn" style="background:#3498db; margin-top:5px;" onclick="copyText('formResult')">কপি করুন</button></div>
     </div>
 
+    <!-- Tab 3: Monthly Calc -->
     <div id="calc" class="tab-content">
         <div class="section-title">চলতি মাসের হিসাব</div>
         <div id="stats" style="background:#e8f5e9; padding:10px; border-radius:8px; margin-bottom:10px;">
             <b>মোট বিক্রি: <span id="totalSales">0</span>৳</b><br>
             <b>মোট অর্ডার: <span id="orderCount">0</span>টি</b>
         </div>
-        <button onclick="clearHistory()" style="background:#ff7675; color:white; border:none; padding:5px; border-radius:5px; font-size:10px; cursor:pointer;">হিসাব রিসেট করুন</button>
+        <button onclick="clearHistory()" style="background:#ff7675; color:white; border:none; padding:5px; border-radius:5px; font-size:10px; cursor:pointer;">রিসেট</button>
         <div id="historyList" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
     </div>
 </div>
@@ -104,7 +127,7 @@
         const total = (p * q) + d;
         if(p > 0) {
             document.getElementById('billOutput').style.display = 'block';
-            document.getElementById('billResult').innerText = `অর্ডার কনফার্ম! Jersey Nova\nমোট বিল: ${total}৳\nঅ্যাডভান্স: ${a}৳\nবাকি: ${total-a}৳`;
+            document.getElementById('billResult').innerText = `অর্ডার কনফার্ম! Jersey Nova ❤️\nমোট বিল: ${total}৳\nঅ্যাডভান্স: ${a}৳\nবাকি: ${total-a}৳`;
         }
     }
 
@@ -112,44 +135,52 @@
         const p = parseInt(document.getElementById('b_price').value) || 0;
         const q = parseInt(document.getElementById('b_qty').value) || 1;
         if(p > 0) {
-            const sale = { date: new Date().toLocaleDateString(), amount: p * q };
-            history.push(sale);
+            history.push({ date: new Date().toLocaleDateString(), amount: p * q });
             localStorage.setItem('jn_history', JSON.stringify(history));
             updateHistoryUI();
-            alert("হিসাবে যোগ করা হয়েছে!");
+            alert("হিসাবে সেভ হয়েছে!");
         }
     }
 
     function updateHistoryUI() {
         const list = document.getElementById('historyList');
-        const totalSales = document.getElementById('totalSales');
-        const orderCount = document.getElementById('orderCount');
-        list.innerHTML = "";
-        let total = 0;
-        history.forEach((item, index) => {
-            total += item.amount;
-            list.innerHTML += `<div class="history-item">${item.date} - ${item.amount}৳</div>`;
-        });
-        totalSales.innerText = total;
-        orderCount.innerText = history.length;
+        let total = 0; list.innerHTML = "";
+        history.forEach(item => { total += item.amount; list.innerHTML += `<div class="history-item">${item.date} - ${item.amount}৳</div>`; });
+        document.getElementById('totalSales').innerText = total;
+        document.getElementById('orderCount').innerText = history.length;
     }
 
-    function clearHistory() {
-        if(confirm("সব হিসাব মুছে ফেলতে চান?")) {
-            history = [];
-            localStorage.setItem('jn_history', '[]');
-            updateHistoryUI();
-        }
-    }
+    function clearHistory() { if(confirm("মুছে ফেলবেন?")) { history = []; localStorage.setItem('jn_history', '[]'); updateHistoryUI(); } }
 
     function genForm() {
+        const qJ = document.getElementById('f_qJ').value;
+        const qP = document.getElementById('f_qP').value;
+        const name = document.getElementById('f_name').value;
+        const phone = document.getElementById('f_phone').value;
+        const jname = document.getElementById('f_jname').value;
+        const jnum = document.getElementById('f_jnum').value;
+        const size = document.getElementById('f_size').value;
+        const hata = document.getElementById('f_hata').value;
+        const gola = document.getElementById('f_gola').value;
+        const dist = document.getElementById('f_dist').value;
+        const thana = document.getElementById('f_thana').value;
+        const area = document.getElementById('f_area').value;
+        const note = document.getElementById('f_note').value;
+
+        let msg = `📝 এই ফ্রমটা ফিলাপ করে দিন:\nঅর্ডার কনফার্ম করার জন্য নিচের নম্বর এ ৫০% অ্যাডভান্স করে নিচের ফ্রম টি ফিল আপ করুন এবং আপনার নম্বর লাস্ট নম্বর বা একটি স্ক্রিনসর্ট দিন।\n01907966882\n\n`;
+        msg += `◈ কত পিস জার্সি - ${qJ}\n◈ কত পিস প্যান্ট - ${qP}\n`;
+        msg += `◈ আপনার নাম - ${name}\n◈ ফোন নাম্বার - ${phone}\n\n`;
+        msg += `◈ জার্সির পিছনের নাম - ${jname}\n◈ জার্সির নাম্বার - ${jnum}\n`;
+        msg += `◈ সাইজ - ${size}\n◈ হাতার ধরণ - ${hata}\n◈ গোলার ধরণ - ${gola}\n\n`;
+        msg += `◈ জেলা - ${dist}\n◈ থানা - ${thana}\n◈ এলাকা/মহল্লা - ${area}\n\n`;
+        msg += `নোট - ${note}\n\nএই গুলো আমাদেরকে দিন।`;
+
         document.getElementById('formOutput').style.display = 'block';
-        document.getElementById('formResult').innerText = `📝 জার্সি নোভা কাস্টমার কেয়ার\nনাম: ${document.getElementById('f_name').value}\nফোন: ${document.getElementById('f_phone').value}\nনোট: ${document.getElementById('f_note').value}`;
+        document.getElementById('formResult').innerText = msg;
     }
 
     function copyText(id) {
-        const text = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(text).then(() => alert("কপি হয়েছে!"));
+        navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => alert("কপি হয়েছে!"));
     }
 </script>
 </body>
