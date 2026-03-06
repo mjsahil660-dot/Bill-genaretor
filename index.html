@@ -6,38 +6,43 @@
     <title>Jersey Nova - Bill Tool</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 90%; max-width: 400px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 95%; max-width: 400px; overflow-y: auto; max-height: 90vh; }
         h2 { color: #333; text-align: center; margin-bottom: 20px; font-size: 22px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 14px; }
+        input { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; padding: 12px; background-color: #2ecc71; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
         button:hover { background-color: #27ae60; }
         #mainContent { display: none; }
         .output-box { background: #f9f9f9; padding: 15px; border-left: 5px solid #2ecc71; border-radius: 5px; white-space: pre-wrap; margin-top: 20px; font-size: 14px; line-height: 1.6; color: #333; }
         .copy-btn { background-color: #3498db; margin-top: 10px; }
-        .copy-btn:hover { background-color: #2980b9; }
     </style>
 </head>
 <body>
 
 <div id="loginSection" class="card">
     <h2>Admin Access 🔒</h2>
-    <p style="text-align: center; color: #666; font-size: 14px;">পাসওয়ার্ড দিন</p>
     <input type="password" id="passInput" placeholder="Password Here">
     <button onclick="checkPassword()">টুল ওপেন করুন</button>
 </div>
 
 <div id="mainContent" class="card">
     <h2>Jersey Nova Billing ⚽</h2>
-    <label>প্রোডাক্ট প্রাইস (৳)</label>
-    <input type="number" id="price" placeholder="উদা: 450" oninput="calculate()">
+    
+    <label>প্রোডাক্ট প্রাইস (১টির দাম ৳)</label>
+    <input type="number" id="unitPrice" placeholder="উদা: 450" oninput="calculate()">
+
+    <label>কোয়ান্টিটি (কয়টি?)</label>
+    <input type="number" id="quantity" value="1" min="1" oninput="calculate()">
+
     <label>ডেলিভারি চার্জ (৳)</label>
     <input type="number" id="delivery" value="80" oninput="calculate()">
+
     <label>অ্যাডভান্স পে (৳)</label>
     <input type="number" id="advance" placeholder="উদা: 200" oninput="calculate()">
+
     <div id="outputContainer" style="display:none;">
         <div class="output-box" id="resultText"></div>
-        <button class="copy-btn" onclick="onclick=copyText()">মেসেজ কপি করুন</button>
+        <button class="copy-btn" onclick="copyText()">মেসেজ কপি করুন</button>
     </div>
 </div>
 
@@ -45,27 +50,27 @@
     const MY_PASSWORD = "sahil882"; 
 
     function checkPassword() {
-        const input = document.getElementById('passInput').value;
-        if(input === MY_PASSWORD) {
+        if(document.getElementById('passInput').value === MY_PASSWORD) {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.body.style.alignItems = 'flex-start';
             document.body.style.paddingTop = '20px';
-        } else {
-            alert("ভুল পাসওয়ার্ড!");
-        }
+        } else { alert("ভুল পাসওয়ার্ড!"); }
     }
 
     function calculate() {
-        const price = parseInt(document.getElementById('price').value) || 0;
+        const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
+        const qty = parseInt(document.getElementById('quantity').value) || 1;
         const delivery = parseInt(document.getElementById('delivery').value) || 0;
         const advance = parseInt(document.getElementById('advance').value) || 0;
-        const total = price + delivery;
-        const due = total - advance;
+        
+        const productTotal = unitPrice * qty;
+        const totalBill = productTotal + delivery;
+        const due = totalBill - advance;
 
-        if(price > 0) {
+        if(unitPrice > 0) {
             document.getElementById('outputContainer').style.display = 'block';
-            const message = `অর্ডারটি কনফার্ম করা হয়েছে। Jersey Nova এর সাথে থাকার জন্য অসংখ্য ধন্যবাদ ভাইয়া ❤️\n\n📦 অর্ডার সামারি:\n• প্রোডাক্ট প্রাইস – ${price}৳\n• ডেলিভারি চার্জ – ${delivery}৳\n• মোট বিল – ${total}৳\n\n💳 অ্যাডভান্স পেয়েছি – ${advance}৳\n🚚 ডেলিভারির সময় বাকি দিতে হবে – ${due}৳\n\nধন্যবাদ আমাদের থেকে অর্ডার করার জন্য। ইনশাআল্লাহ খুব দ্রুত আপনার অর্ডারটি কুরিয়ারে পাঠানো হবে। ❤️`;
+            const message = `অর্ডারটি কনফার্ম করা হয়েছে। Jersey Nova এর সাথে থাকার জন্য অসংখ্য ধন্যবাদ ভাইয়া ❤️\n\n📦 অর্ডার সামারি:\n• প্রোডাক্ট প্রাইস – ${unitPrice}৳ x ${qty} = ${productTotal}৳\n• ডেলিভারি চার্জ – ${delivery}৳\n• মোট বিল – ${totalBill}৳\n\n💳 অ্যাডভান্স পেয়েছি – ${advance}৳\n🚚 ডেলিভারির সময় বাকি দিতে হবে – ${due}৳\n\nধন্যবাদ আমাদের থেকে অর্ডার করার জন্য। ইনশাআল্লাহ খুব দ্রুত আপনার অর্ডারটি কুরিয়ারে পাঠানো হবে। ❤️`;
             document.getElementById('resultText').innerText = message;
         } else {
             document.getElementById('outputContainer').style.display = 'none';
