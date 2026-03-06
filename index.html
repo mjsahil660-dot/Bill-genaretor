@@ -3,110 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jersey Nova - All in One Tool</title>
+    <title>Jersey Nova Customer Care</title>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063822.png">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063822.png">
+    
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; margin-top: 10px; }
-        
-        /* Login Design */
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        .header-title { text-align: center; color: #166534; margin-bottom: 15px; border-bottom: 2px solid #2ecc71; padding-bottom: 10px; }
         #loginSection { text-align: center; margin-top: 50px; }
-        
-        /* Navigation Menu */
-        .nav-menu { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .nav-btn { flex: 1; padding: 10px; border: none; background: #ddd; border-radius: 8px; cursor: pointer; font-weight: bold; color: #555; transition: 0.3s; }
+        .nav-menu { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-btn { flex: 1; padding: 8px; border: none; background: #ddd; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
         .nav-btn.active { background: #2ecc71; color: white; }
-
-        /* General UI */
-        h2 { color: #333; text-align: center; font-size: 20px; margin-top: 0; }
-        .section-title { background: #f8f9fa; padding: 5px 10px; margin: 15px 0 10px; font-weight: bold; color: #27ae60; border-radius: 5px; font-size: 14px; border-left: 4px solid #2ecc71; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 13px; }
-        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        .section-title { background: #f8f9fa; padding: 5px 10px; margin: 15px 0 10px; font-weight: bold; color: #27ae60; border-radius: 5px; font-size: 13px; border-left: 4px solid #2ecc71; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 12px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
         button.main-btn { width: 100%; padding: 12px; background-color: #2ecc71; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .output-box { background: #fffbe6; padding: 15px; border: 1px dashed #f1c40f; border-radius: 8px; white-space: pre-wrap; margin-top: 15px; font-size: 14px; line-height: 1.6; color: #333; }
-        .copy-btn { background-color: #3498db; margin-top: 10px; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        #mainContainer { display: none; }
-        .tab-content { display: none; }
+        .output-box { background: #fffbe6; padding: 15px; border: 1px dashed #f1c40f; border-radius: 8px; white-space: pre-wrap; margin-top: 15px; font-size: 13px; line-height: 1.6; color: #333; }
+        #mainContainer, .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .history-item { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<!-- Login Section -->
 <div id="loginSection" class="card">
-    <h2>Admin Access 🔒</h2>
-    <input type="password" id="passInput" placeholder="পাসওয়ার্ড দিন">
-    <button class="main-btn" onclick="checkPassword()">প্রবেশ করুন</button>
+    <h2>Jersey Nova Admin 🔒</h2>
+    <input type="password" id="passInput" placeholder="Password">
+    <button class="main-btn" onclick="checkPassword()">Login</button>
 </div>
 
-<!-- Main Tool Container -->
 <div id="mainContainer" class="card">
+    <h2 class="header-title">Jersey Nova Customer Care</h2>
+    
     <div class="nav-menu">
         <button id="btn-bill" class="nav-btn active" onclick="showTab('bill')">বিল জেনারেটর</button>
         <button id="btn-form" class="nav-btn" onclick="showTab('form')">অর্ডার ফর্ম</button>
+        <button id="btn-calc" class="nav-btn" onclick="showTab('calc')">মাসিক হিসাব</button>
     </div>
 
-    <!-- Tab 1: Bill Generator -->
     <div id="bill" class="tab-content active">
-        <h2>Bill Generator 💰</h2>
-        <label>প্রোডাক্ট প্রাইস (৳)</label>
-        <input type="number" id="b_price" placeholder="450" oninput="calcBill()">
-        <label>কোয়ান্টিটি (পিস)</label>
-        <input type="number" id="b_qty" value="1" oninput="calcBill()">
-        <label>ডেলিভারি চার্জ (৳)</label>
-        <input type="number" id="b_delivery" value="80" oninput="calcBill()">
-        <label>অ্যাডভান্স পে (৳)</label>
-        <input type="number" id="b_advance" value="0" oninput="calcBill()">
-        
-        <div id="billOutput" style="display:none;">
-            <div class="output-box" id="billResult"></div>
-            <button class="copy-btn" onclick="copyText('billResult')">বিল মেসেজ কপি করুন</button>
-        </div>
+        <label>প্রাইস (৳)</label><input type="number" id="b_price" oninput="calcBill()">
+        <label>কোয়ান্টিটি</label><input type="number" id="b_qty" value="1" oninput="calcBill()">
+        <label>ডেলিভারি</label><input type="number" id="b_delivery" value="80" oninput="calcBill()">
+        <label>অ্যাডভান্স</label><input type="number" id="b_advance" value="0" oninput="calcBill()">
+        <button class="main-btn" onclick="saveToHistory()">হিসাবে যোগ করুন</button>
+        <div id="billOutput" style="display:none;"><div class="output-box" id="billResult"></div><button class="main-btn" style="background:#3498db; margin-top:5px;" onclick="copyText('billResult')">কপি করুন</button></div>
     </div>
 
-    <!-- Tab 2: Order Form -->
     <div id="form" class="tab-content">
-        <h2>Order Form 📝</h2>
-        <div class="section-title">পণ্য ও সংখ্যা</div>
         <div class="grid">
-            <div><label>জার্সি (পিস)</label><input type="number" id="f_qJ" value="1"></div>
-            <div><label>প্যান্ট (পিস)</label><input type="number" id="f_qP" value="0"></div>
+            <input type="text" id="f_name" placeholder="নাম">
+            <input type="text" id="f_phone" placeholder="ফোন">
         </div>
-
-        <div class="section-title">কাস্টমার ও ঠিকানা</div>
-        <input type="text" id="f_name" placeholder="কাস্টমারের নাম">
-        <input type="text" id="f_phone" placeholder="ফোন নাম্বার">
-        <div class="grid">
-            <input type="text" id="f_dist" placeholder="জেলা">
-            <input type="text" id="f_thana" placeholder="থানা">
-        </div>
-        <textarea id="f_area" placeholder="এলাকা/মহল্লা/বাসা নং" rows="2"></textarea>
-
-        <div class="section-title">জার্সির ডিটেইলস</div>
         <div class="grid">
             <input type="text" id="f_jname" placeholder="পিছনের নাম">
             <input type="text" id="f_jnum" placeholder="নাম্বার">
         </div>
-        <input type="text" id="f_size" placeholder="সাইজ (M, L, XL, XXL)">
+        <textarea id="f_note" placeholder="নোট (লোগো/ডিজাইন)" rows="2"></textarea>
+        <button class="main-btn" onclick="genForm()">অর্ডার ফর্ম তৈরি করুন</button>
+        <div id="formOutput" style="display:none;"><div class="output-box" id="formResult"></div><button class="main-btn" style="background:#3498db; margin-top:5px;" onclick="copyText('formResult')">কপি করুন</button></div>
+    </div>
 
-        <button class="main-btn" onclick="genForm()">মেসেজ তৈরি করুন</button>
-        
-        <div id="formOutput" style="display:none;">
-            <div class="output-box" id="formResult"></div>
-            <button class="copy-btn" onclick="copyText('formResult')">ফরম কপি করুন</button>
+    <div id="calc" class="tab-content">
+        <div class="section-title">চলতি মাসের হিসাব</div>
+        <div id="stats" style="background:#e8f5e9; padding:10px; border-radius:8px; margin-bottom:10px;">
+            <b>মোট বিক্রি: <span id="totalSales">0</span>৳</b><br>
+            <b>মোট অর্ডার: <span id="orderCount">0</span>টি</b>
         </div>
+        <button onclick="clearHistory()" style="background:#ff7675; color:white; border:none; padding:5px; border-radius:5px; font-size:10px; cursor:pointer;">হিসাব রিসেট করুন</button>
+        <div id="historyList" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
     </div>
 </div>
 
 <script>
     const PASS = "sahil882";
+    let history = JSON.parse(localStorage.getItem('jn_history') || '[]');
 
     function checkPassword() {
         if(document.getElementById('passInput').value === PASS) {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('mainContainer').style.display = 'block';
+            updateHistoryUI();
         } else { alert("ভুল পাসওয়ার্ড!"); }
     }
 
@@ -123,33 +102,49 @@
         const d = parseInt(document.getElementById('b_delivery').value) || 0;
         const a = parseInt(document.getElementById('b_advance').value) || 0;
         const total = (p * q) + d;
-        const due = total - a;
-
         if(p > 0) {
             document.getElementById('billOutput').style.display = 'block';
-            document.getElementById('billResult').innerText = `অর্ডারটি কনফার্ম করা হয়েছে। Jersey Nova এর সাথে থাকার জন্য ধন্যবাদ ❤️\n\n📦 অর্ডার সামারি:\n• প্রোডাক্ট প্রাইস – ${p}৳ x ${q} = ${p*q}৳\n• ডেলিভারি চার্জ – ${d}৳\n• মোট বিল – ${total}৳\n\n💳 অ্যাডভান্স পেয়েছি – ${a}৳\n🚚 বাকি বিল – ${due}৳\n\nইনশাআল্লাহ দ্রুত পাঠানো হবে। ❤️`;
+            document.getElementById('billResult').innerText = `অর্ডার কনফার্ম! Jersey Nova\nমোট বিল: ${total}৳\nঅ্যাডভান্স: ${a}৳\nবাকি: ${total-a}৳`;
+        }
+    }
+
+    function saveToHistory() {
+        const p = parseInt(document.getElementById('b_price').value) || 0;
+        const q = parseInt(document.getElementById('b_qty').value) || 1;
+        if(p > 0) {
+            const sale = { date: new Date().toLocaleDateString(), amount: p * q };
+            history.push(sale);
+            localStorage.setItem('jn_history', JSON.stringify(history));
+            updateHistoryUI();
+            alert("হিসাবে যোগ করা হয়েছে!");
+        }
+    }
+
+    function updateHistoryUI() {
+        const list = document.getElementById('historyList');
+        const totalSales = document.getElementById('totalSales');
+        const orderCount = document.getElementById('orderCount');
+        list.innerHTML = "";
+        let total = 0;
+        history.forEach((item, index) => {
+            total += item.amount;
+            list.innerHTML += `<div class="history-item">${item.date} - ${item.amount}৳</div>`;
+        });
+        totalSales.innerText = total;
+        orderCount.innerText = history.length;
+    }
+
+    function clearHistory() {
+        if(confirm("সব হিসাব মুছে ফেলতে চান?")) {
+            history = [];
+            localStorage.setItem('jn_history', '[]');
+            updateHistoryUI();
         }
     }
 
     function genForm() {
-        const qJ = document.getElementById('f_qJ').value || 0;
-        const qP = document.getElementById('f_qP').value || 0;
-        const name = document.getElementById('f_name').value || "....";
-        const phone = document.getElementById('f_phone').value || "....";
-        
-        let msg = `📝 অর্ডার কনফার্ম করার জন্য নিচের নম্বরে অ্যাডভান্স করে ফর্মটি পূরণ করুন।\nBkash/Nagad: 01907966882\n\n`;
-        msg += `◈ কত পিস জার্সি - ${qJ}\n◈ কত পিস প্যান্ট - ${qP}\n`;
-        msg += `◈ আপনার নাম - ${name}\n◈ ফোন নাম্বার - ${phone}\n\n`;
-        msg += `◈ জার্সির নাম - ${document.getElementById('f_jname').value || "N/A"}\n`;
-        msg += `◈ জার্সি নাম্বার - ${document.getElementById('f_jnum').value || "N/A"}\n`;
-        msg += `◈ সাইজ - ${document.getElementById('f_size').value || "...."}\n\n`;
-        msg += `◈ জেলা - ${document.getElementById('f_dist').value || "...."}\n`;
-        msg += `◈ থানা - ${document.getElementById('f_thana').value || "...."}\n`;
-        msg += `◈ এলাকা - ${document.getElementById('f_area').value || "...."}\n\n`;
-        msg += `ধন্যবাদ, Jersey Nova ❤️`;
-
         document.getElementById('formOutput').style.display = 'block';
-        document.getElementById('formResult').innerText = msg;
+        document.getElementById('formResult').innerText = `📝 জার্সি নোভা কাস্টমার কেয়ার\nনাম: ${document.getElementById('f_name').value}\nফোন: ${document.getElementById('f_phone').value}\nনোট: ${document.getElementById('f_note').value}`;
     }
 
     function copyText(id) {
@@ -157,6 +152,5 @@
         navigator.clipboard.writeText(text).then(() => alert("কপি হয়েছে!"));
     }
 </script>
-
 </body>
 </html>
