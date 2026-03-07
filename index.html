@@ -3,158 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jersey Nova - Order Form</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063822.png">
+    <title>Jersey Nova - Business Manager Pro</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
-        .header-title { text-align: center; color: #166534; border-bottom: 2px solid #2ecc71; padding-bottom: 10px; margin-bottom: 15px; }
-        .nav-menu { display: flex; gap: 5px; margin-bottom: 20px; }
-        .nav-btn { flex: 1; padding: 10px; border: none; background: #ddd; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .nav-btn.active { background: #2ecc71; color: white; }
-        .section-title { background: #f8f9fa; padding: 5px 10px; margin: 15px 0 10px; font-weight: bold; color: #27ae60; border-radius: 5px; font-size: 13px; border-left: 4px solid #2ecc71; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 12px; }
-        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .main-btn { width: 100%; padding: 15px; background-color: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        #adminPanel, #loginSection { display: none; }
-        .customer-notice { font-size: 12px; background: #fffbe6; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe58f; }
+        :root {
+            --primary-dark: #0f172a;
+            --brand-green: #2ecc71;
+            --sidebar-width: 260px;
+            --bg-light: #f8fafc;
+            --border: #e2e8f0;
+            --accent: #4f46e5;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); margin: 0; color: var(--text-main); overflow-x: hidden; }
+
+        /* --- 1. AUTH / LOGIN SECTION --- */
+        #auth-section { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; background: #f1f5f9; }
+        .auth-container { background: white; width: 100%; max-width: 400px; padding: 40px 30px; border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); text-align: center; }
+        .logo-box { background: linear-gradient(135deg, var(--primary-dark), #1e293b); width: 80px; height: 80px; border-radius: 22px; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; }
+        .logo-box svg { width: 40px; height: 40px; fill: var(--brand-green); }
+
+        /* --- 2. MAIN LAYOUT STRUCTURE --- */
+        #main-layout { display: none; min-height: 100vh; }
+        
+        /* SIDEBAR */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            background: white; 
+            height: 100vh; 
+            border-right: 1px solid var(--border); 
+            position: fixed; 
+            padding: 25px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 1000; 
+        }
+
+        .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 30px; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        .nav-items { flex-grow: 1; margin-top: 20px; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 18px; color: var(--text-muted); font-size: 13.5px; font-weight: 500; border-radius: 12px; margin-bottom: 6px; cursor: pointer; transition: 0.2s ease; }
+        .menu-item:hover { background: #f8fafc; color: var(--accent); }
+        .menu-item.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        .menu-item i { width: 20px; text-align: center; }
+
+        /* Sidebar Bottom Profile (As per screenshot) */
+        .sidebar-bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+        .user-card { background: #fbfcfd; border: 1px solid var(--border); padding: 12px; border-radius: 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .user-avatar { background: #eef2ff; color: var(--accent); width: 38px; height: 38px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 16px; }
+        .logout-btn { color: #ef4444; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; padding-left: 10px; transition: 0.2s; }
+        .logout-btn:hover { opacity: 0.8; }
+
+        /* --- 3. COMMON UI COMPONENTS --- */
+        .card-container { background: white; border-radius: 24px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 25px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        
+        .form-group { text-align: left; margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 14px; background: #fbfcfd; transition: 0.3s; }
+        .form-group input:focus { border-color: var(--accent); background: white; }
+
+        .action-btn { width: 100%; padding: 15px; background: var(--primary-dark); color: white; border: none; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.3s; }
+        .action-btn:hover { background: #000; transform: translateY(-2px); }
+
+        /* Table Styles */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+        td { padding: 15px; font-size: 13.5px; border-bottom: 1px solid #f8fafc; }
+
+        /* Header Info Badge */
+        .location-badge { font-size: 11px; background: #eef2ff; color: var(--accent); padding: 7px 15px; border-radius: 20px; font-weight: 500; }
+
+        @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } .sidebar { display: none; } .main-content { margin-left: 0; } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 class="header-title">Jersey Nova Customer Care</h2>
-    
-    <div style="text-align:right;"><small id="adminLink" onclick="showLogin()" style="color:#ccc; cursor:pointer;">Admin Login</small></div>
+<!-- 1. AUTH / LOGIN SECTION -->
+<div id="auth-section">
+    <div class="auth-container">
+        <div class="logo-box"><svg viewBox="0 0 24 24"><path d="M12,3L4,9V21H20V9L12,3M12,7.7C14.1,7.7 15.8,9.4 15.8,11.5C15.8,14.5 12,18 12,18C12,18 8.2,14.5 8.2,11.5C8.2,9.4 9.9,7.7 12,7.7M12,10C11.2,10 10.5,10.7 10.5,11.5C10.5,12.3 11.2,13 12,13C12.8,13 13.5,12.3 13.5,11.5C13.5,10.7 12.8,10 12,10Z"/></svg></div>
+        <h1 style="margin: 0; font-size: 24px;">Jersey Nova</h1>
+        <p style="color: var(--text-muted); margin-bottom: 35px; font-size: 14px;">প্রফেশনাল ডিজিটাল পার্টনার</p>
+        <div class="form-group"><label>ইমেইল</label><input type="email" placeholder="manager@jerseynova.com"></div>
+        <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" placeholder="••••••••"></div>
+        <button class="action-btn" onclick="login()" style="padding: 18px;">লগইন করুন →</button>
+    </div>
+</div>
 
-    <div id="loginSection">
-        <input type="password" id="passInput" placeholder="Password">
-        <button onclick="checkPassword()" style="width:100%; padding:8px; background:#333; color:white; border-radius:8px;">Login</button>
+<!-- 2. MAIN APPLICATION LAYOUT -->
+<div id="main-layout">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div style="font-weight:700; display:flex; align-items:center; gap:12px; padding: 0 10px; margin-bottom: 20px;">
+            <div style="background:var(--primary-dark); color:var(--brand-green); padding:6px 10px; border-radius:10px; font-size: 16px;">JN</div> 
+            <div>
+                <div style="font-size: 14px; line-height: 1.2;">Business</div>
+                <div style="font-size: 10px; color: #94a3b8; letter-spacing: 1px;">MANAGER PRO</div>
+            </div>
+        </div>
+
+        <div class="nav-items">
+            <div class="menu-item" onclick="showPage('dash')"><i class="fas fa-th-large"></i> ড্যাশবোর্ড</div>
+            <div class="menu-item" onclick="showPage('inv')"><i class="fas fa-box"></i> ইনভেন্টরি</div>
+            <div class="menu-item" onclick="showPage('pos')"><i class="fas fa-shopping-cart"></i> POS (অর্ডার)</div>
+            <div class="menu-item" onclick="showPage('orders')"><i class="fas fa-list"></i> অর্ডার লিস্ট</div>
+            <div class="menu-item" onclick="showPage('supp')"><i class="fas fa-truck"></i> সাপ্লায়ার</div>
+            <div class="menu-item" onclick="showPage('cust')"><i class="fas fa-users"></i> কাস্টমার ডাটা</div>
+            <div class="menu-item" onclick="showPage('exp')"><i class="fas fa-wallet"></i> খরচপাতি</div>
+            <div class="menu-item" onclick="showPage('settings')"><i class="fas fa-cog"></i> সেটিংস</div>
+        </div>
+
+        <!-- Sidebar User Profile (As per your screenshot) -->
+        <div class="sidebar-bottom">
+            <div class="user-card">
+                <div class="user-avatar">J</div>
+                <div>
+                    <div style="font-size: 12.5px; font-weight: 600; color: var(--text-main);">Jersey nova</div>
+                    <div style="font-size: 9px; color: var(--text-muted);">mjsahil660@gmail.com</div>
+                </div>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> লগ আউট
+            </div>
+        </div>
     </div>
 
-    <div id="adminPanel">
-        <div class="nav-menu">
-            <button id="btn-bill" class="nav-btn active" onclick="showTab('bill')">বিল জেনারেটর</button>
-            <button id="btn-calc" class="nav-btn" onclick="showTab('calc')">মাসিক হিসাব</button>
-        </div>
-        <div id="bill" class="tab-content active">
-             <label>প্রাইস (৳)</label><input type="number" id="b_price" oninput="calcBill()">
-             <label>কোয়ান্টিটি</label><input type="number" id="b_qty" value="1" oninput="calcBill()">
-             <label>ডেলিভারি</label><input type="number" id="b_delivery" value="80" oninput="calcBill()">
-             <label>অ্যাডভান্স</label><input type="number" id="b_advance" value="0" oninput="calcBill()">
-             <button class="main-btn" style="background:#2ecc71;" onclick="saveToHistory()">হিসাবে যোগ করুন</button>
-             <div id="billOutput" style="display:none;"><div id="billResult" style="padding:10px; border:1px dashed #777; margin-top:10px; white-space:pre-wrap;"></div></div>
-        </div>
-        <div id="calc" class="tab-content" style="display:none;">
-            <div id="stats" style="background:#e8f5e9; padding:10px; border-radius:8px;">মোট বিক্রি: <span id="totalSales">0</span>৳</div>
-            <div id="historyList" style="margin-top:10px;"></div>
-        </div>
-    </div>
-
-    <div id="customerForm">
-        <div class="customer-notice">
-            📝 <b>নির্দেশনা:</b> ফর্মটি সঠিক তথ্য দিয়ে পূরণ করে নিচের বাটনে ক্লিক করুন। এটি সরাসরি আমাদের হোয়াটসঅ্যাপে চলে আসবে।
+    <!-- Main Content Area -->
+    <div class="main-content">
+        
+        <!-- Header Info -->
+        <div style="display:flex; justify-content: flex-end; margin-bottom: 25px;">
+            <span class="location-badge"><i class="fas fa-map-marker-alt"></i> যাত্রাবাড়ী, ভাঙাপ্রেস</span>
         </div>
 
-        <div class="section-title">পেমেন্ট ডিটেইলস (বিকাশ/নগদ: 01907966882)</div>
-        <div class="grid">
-            <select id="f_method">
-                <option value="বিকাশ">বিকাশ</option>
-                <option value="নগদ">নগদ</option>
-            </select>
-            <input type="text" id="f_lastDigits" placeholder="লাস্ট ৩ ডিজিট বা নাম">
+        <!-- 1. Dashboard Page -->
+        <div id="page-dash">
+            <h2 style="font-size: 18px; margin-bottom: 20px;">DASHBOARD</h2>
+            <div class="grid-2">
+                <div class="card-container">আজকের মোট বিক্রয়: <br><strong style="font-size: 24px;">৳ ০</strong></div>
+                <div class="card-container">আজকের মোট খরচ: <br><strong style="font-size: 24px;">৳ ০</strong></div>
+            </div>
         </div>
-        
-        <div class="grid">
-            <div><label>জার্সি (পিস)</label><input type="number" id="f_qJ" value="1"></div>
-            <div><label>প্যান্ট (পিস)</label><input type="number" id="f_qP" value="0"></div>
+
+        <!-- 2. Inventory Page -->
+        <div id="page-inv" style="display:none;">
+            <h2 style="font-size: 18px;">INVENTORY</h2>
+            <div class="card-container">ইনভেন্টরি লিস্ট লোড হচ্ছে...</div>
         </div>
-        <div class="grid">
-            <input type="text" id="f_name" placeholder="আপনার নাম">
-            <input type="text" id="f_phone" placeholder="ফোন নাম্বার">
+
+        <!-- 3. POS Page -->
+        <div id="page-pos" style="display:none;">
+            <h2 style="font-size: 18px;">POS (NEW ORDER)</h2>
+            <div class="card-container">অর্ডার করার জন্য পণ্য নির্বাচন করুন।</div>
         </div>
-        <div class="section-title">ডিজাইন ডিটেইলস</div>
-        <div class="grid">
-            <input type="text" id="f_jname" placeholder="পিছনের নাম">
-            <input type="text" id="f_jnum" placeholder="নাম্বার">
+
+        <!-- 4. Order List Page -->
+        <div id="page-orders" style="display:none;">
+            <h2 style="font-size: 18px;">ORDER LIST</h2>
+            <div class="card-container">কোনো অর্ডার পাওয়া যায়নি।</div>
         </div>
-        <div class="grid">
-            <input type="text" id="f_size" placeholder="সাইজ">
-            <input type="text" id="f_hata" placeholder="হাফ/ফুল হাতা">
+
+        <!-- 5. Supplier Page -->
+        <div id="page-supp" style="display:none;">
+            <h2 style="font-size: 18px;">SUPPLIERS</h2>
+            <div class="card-container">সাপ্লায়ার ডাটা খালি।</div>
         </div>
-        <input type="text" id="f_gola" placeholder="গোলার ধরণ (গোল/ভি কলার)">
-        
-        <div class="section-title">ঠিকানা</div>
-        <div class="grid">
-            <input type="text" id="f_dist" placeholder="জেলা">
-            <input type="text" id="f_thana" placeholder="থানা">
+
+        <!-- 6. Customers Page (As per screenshot) -->
+        <div id="page-cust" style="display:none;">
+            <h2 style="font-size: 18px; margin-bottom: 20px;">CUSTOMERS</h2>
+            <div class="card-container">
+                <h3 style="font-size: 15px; margin-bottom: 20px;">কাস্টমার ডাটাবেজ</h3>
+                <table>
+                    <thead>
+                        <tr><th>নাম</th><th>মোবাইল</th><th>ঠিকানা</th><th>অর্ডার</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-muted);">তথ্য নেই</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <input type="text" id="f_area" placeholder="এলাকা/মহল্লা">
-        
-        <label>নোট (লোগো বা কাস্টম ডিজাইন)</label>
-        <textarea id="f_note" placeholder="যেমন: সামনে লোগো হবে..." rows="2"></textarea>
-        
-        <button class="main-btn" onclick="submitToWA()">WhatsApp-এ অর্ডার পাঠান 🚀</button>
+
+        <!-- 7. Expenses Page (As per screenshot) -->
+        <div id="page-exp" style="display:none;">
+            <h2 style="font-size: 18px; margin-bottom: 20px;">EXPENSES</h2>
+            <div class="grid-2">
+                <div class="card-container">
+                    <h3 style="font-size: 15px; margin-bottom: 20px;"><i class="fas fa-credit-card" style="color:#ef4444;"></i> খরচ এন্ট্রি</h3>
+                    <div class="form-group"><label>বিবরণ</label><input type="text" placeholder="কিসের খরচ?"></div>
+                    <div class="form-group"><label>টাকা</label><input type="number" placeholder="0"></div>
+                    <div class="form-group">
+                        <label>খাত</label>
+                        <select>
+                            <option>Rent</option><option>Electricity</option><option>Transport</option>
+                            <option>Salary</option><option selected>Marketing</option>
+                            <option>Tea/Snacks</option><option>Other</option>
+                        </select>
+                    </div>
+                    <button class="action-btn"><i class="fas fa-save"></i> খরচ সেভ করুন</button>
+                </div>
+                <div>
+                    <h3 style="font-size: 15px; margin-bottom: 15px;">খরচের তালিকা</h3>
+                    <div style="background: white; padding: 15px 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size:14px; font-weight:600;">ডেলিভারি</div>
+                            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Transport</div>
+                        </div>
+                        <div style="color:#ef4444; font-weight:700;">-৳ ৯০</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Settings Page (As per screenshot) -->
+        <div id="page-settings" style="display:none;">
+            <h2 style="font-size: 18px; margin-bottom: 20px;">SETTINGS</h2>
+            <div class="card-container" style="max-width: 650px; margin: 0 auto; border: 1.5px solid var(--accent); box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; border-bottom: 1px solid #f1f5f9; padding-bottom:20px;">
+                    <div style="background:#eef2ff; color:var(--accent); width:45px; height:45px; border-radius:12px; display:flex; justify-content:center; align-items:center; font-size:18px;"><i class="fas fa-briefcase"></i></div>
+                    <div>
+                        <h3 style="margin:0; font-size:17px; color: #1e293b;">ব্যবসায়িক প্রোফাইল</h3>
+                        <p style="margin:0; font-size:11px; color:var(--text-muted);">ইনভয়েসে এই তথ্যগুলো ব্যবহার হবে</p>
+                    </div>
+                </div>
+                <div class="form-group"><label>দোকানের লোগো</label><input type="file" style="border:none; padding: 0;"></div>
+                <div class="form-group"><label>দোকানের নাম</label><input type="text" value="Jersey nova"></div>
+                <div class="form-group"><label>মোবাইল নাম্বার</label><input type="text" value="01907966882"></div>
+                <div class="form-group"><label>দোকানের ঠিকানা</label><textarea rows="3">যাত্রাবাড়ী, ভাঙাপ্রেস</textarea></div>
+                <button class="action-btn" style="background: #111827;"><i class="fas fa-sync-alt"></i> তথ্য আপডেট করুন</button>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
-    const MY_PHONE = "8801907966882";
-    const PASS = "sahil882";
-
-    function showLogin() { document.getElementById('loginSection').style.display = 'block'; }
-
-    function checkPassword() {
-        if(document.getElementById('passInput').value === PASS) {
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('customerForm').style.display = 'none';
-            document.getElementById('loginSection').style.display = 'none';
-        } else { alert("ভুল পাসওয়ার্ড!"); }
+    // Login Function
+    function login() {
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('main-layout').style.display = 'flex';
+        showPage('dash'); // Default landing
     }
 
-    function showTab(t) {
-        document.getElementById('bill').style.display = t=='bill'?'block':'none';
-        document.getElementById('calc').style.display = t=='calc'?'block':'none';
-        document.getElementById('btn-bill').className = t=='bill'?'nav-btn active':'nav-btn';
-        document.getElementById('btn-calc').className = t=='calc'?'nav-btn active':'nav-btn';
+    // Logout Function
+    function logout() {
+        if(confirm("আপনি কি নিশ্চিত যে লগ আউট করতে চান?")) {
+            document.getElementById('main-layout').style.display = 'none';
+            document.getElementById('auth-section').style.display = 'flex';
+        }
     }
 
-    function submitToWA() {
-        let msg = `📝 *নতুন অর্ডার ফর্ম*\n\n`;
-        msg += `💰 *পেমেন্ট:* ${document.getElementById('f_method').value} (লাস্ট: ${document.getElementById('f_lastDigits').value})\n\n`;
-        msg += `◈ কত পিস জার্সি - ${document.getElementById('f_qJ').value}\n`;
-        msg += `◈ কত পিস প্যান্ট - ${document.getElementById('f_qP').value}\n`;
-        msg += `◈ নাম - ${document.getElementById('f_name').value}\n`;
-        msg += `◈ ফোন - ${document.getElementById('f_phone').value}\n\n`;
-        msg += `◈ জার্সির নাম - ${document.getElementById('f_jname').value}\n`;
-        msg += `◈ জার্সি নাম্বার - ${document.getElementById('f_jnum').value}\n`;
-        msg += `◈ সাইজ - ${document.getElementById('f_size').value}\n`;
-        msg += `◈ হাতার ধরণ - ${document.getElementById('f_hata').value}\n`;
-        msg += `◈ গোলার ধরণ - ${document.getElementById('f_gola').value}\n\n`;
-        msg += `◈ জেলা - ${document.getElementById('f_dist').value}\n`;
-        msg += `◈ থানা - ${document.getElementById('f_thana').value}\n`;
-        msg += `◈ এলাকা - ${document.getElementById('f_area').value}\n\n`;
-        msg += `◈ নোট - ${document.getElementById('f_note').value}`;
+    // Page Router
+    function showPage(pageId) {
+        const pages = ['dash', 'inv', 'pos', 'orders', 'supp', 'cust', 'exp', 'settings'];
+        pages.forEach(p => {
+            const el = document.getElementById('page-' + p);
+            if(el) el.style.display = 'none';
+        });
         
-        window.open(`https://wa.me/${MY_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+        document.getElementById('page-' + pageId).style.display = 'block';
+        
+        // Active Sidebar State
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active');
+            if(item.getAttribute('onclick').includes("'" + pageId + "'")) {
+                item.classList.add('active');
+            }
+        });
     }
 
-    let history = JSON.parse(localStorage.getItem('jn_history') || '[]');
-    function calcBill() {
-        const p=parseInt(document.getElementById('b_price').value)||0, q=parseInt(document.getElementById('b_qty').value)||1, d=parseInt(document.getElementById('b_delivery').value)||0, a=parseInt(document.getElementById('b_advance').value)||0;
-        if(p>0){document.getElementById('billOutput').style.display='block'; document.getElementById('billResult').innerText=`অর্ডার কনফার্ম!\nমোট: ${p*q+d}৳\nঅ্যাডভান্স: ${a}৳\nবাকি: ${p*q+d-a}৳`;}
-    }
-    function saveToHistory() {
-        const p=parseInt(document.getElementById('b_price').value)||0, q=parseInt(document.getElementById('b_qty').value)||1;
-        if(p>0){history.push({d:new Date().toLocaleDateString(), a:p*q}); localStorage.setItem('jn_history', JSON.stringify(history)); alert("সেভ হয়েছে!"); updateHistory();}
-    }
-    function updateHistory() {
-        let t=0; document.getElementById('historyList').innerHTML="";
-        history.forEach(i=>{t+=i.a; document.getElementById('historyList').innerHTML+=`<div>${i.d} - ${i.a}৳</div>`;});
-        document.getElementById('totalSales').innerText=t;
-    }
-    updateHistory();
+    // Initialize with Dashboard active
+    window.onload = function() {
+        // Ready for action
+    };
 </script>
+
 </body>
 </html>
