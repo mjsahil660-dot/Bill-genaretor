@@ -18,31 +18,36 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .main-btn { width: 100%; padding: 15px; background-color: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
         #adminPanel, #loginSection { display: none; }
-        .customer-notice { font-size: 12px; background: #fffbe6; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe58f; }
         .jersey-item { background: #f1f1f1; padding: 10px; border-radius: 8px; margin-bottom: 10px; position: relative; }
 
-        /* Print Styles */
+        /* PRINT CSS - FIXED WHITE PAGE */
+        #invoice-box { display: none; }
         @media print {
-            body * { visibility: hidden; }
-            #invoice-print, #invoice-print * { visibility: visible; }
-            #invoice-print { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; }
+            body { background: white; padding: 0; }
+            .card { display: none !important; }
+            #invoice-box { 
+                display: block !important; 
+                width: 100%; 
+                padding: 40px;
+                box-sizing: border-box;
+                color: #000;
+            }
         }
 
-        #invoice-print { display: none; background: #fff; width: 210mm; min-height: 297mm; padding: 20px; box-sizing: border-box; }
-        .inv-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        /* Invoice Design */
+        .inv-head { display: flex; justify-content: space-between; border-bottom: 3px solid #2ecc71; padding-bottom: 10px; }
         .inv-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .inv-table th { background: #0f172a; color: #fff; padding: 10px; text-align: left; }
-        .inv-table td { padding: 10px; border-bottom: 1px solid #eee; }
-        .inv-total-box { margin-top: 20px; float: right; width: 200px; background: #f8fafc; padding: 15px; border-radius: 10px; }
-        .inv-status { color: red; font-weight: bold; font-size: 20px; }
+        .inv-table th { background: #f2f2f2; text-align: left; padding: 10px; border: 1px solid #ddd; }
+        .inv-table td { padding: 10px; border: 1px solid #ddd; }
+        .inv-total { float: right; width: 200px; margin-top: 20px; }
+        .total-row { display: flex; justify-content: space-between; padding: 5px 0; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2 class="header-title">Jersey Nova Customer Care</h2>
-    
-    <div style="text-align:right;"><small id="adminLink" onclick="showLogin()" style="color:#ccc; cursor:pointer;">Admin Login</small></div>
+    <h2 class="header-title">Jersey Nova Admin</h2>
+    <div style="text-align:right;"><small onclick="showLogin()" style="color:#ccc; cursor:pointer;">Admin Login</small></div>
 
     <div id="loginSection">
         <input type="password" id="passInput" placeholder="Password">
@@ -54,239 +59,151 @@
             <button id="btn-bill" class="nav-btn active" onclick="showTab('bill')">বিল জেনারেটর</button>
             <button id="btn-calc" class="nav-btn" onclick="showTab('calc')">হিসাব ও লাভ</button>
         </div>
-        <div id="bill" class="tab-content active">
+        <div id="bill">
+             <label>কাস্টমারের নাম</label><input type="text" id="b_name" placeholder="Name">
+             <label>ফোন নাম্বার</label><input type="text" id="b_phone" placeholder="Phone">
              <label>বিক্রয় মূল্য (৳)</label><input type="number" id="b_price" oninput="calcBill()">
-             <label>ফ্যাক্টরি রেট (কেনা দাম ৳)</label><input type="number" id="b_factory" placeholder="প্রতি পিস কত খরচ?">
+             <label>ফ্যাক্টরি রেট (কেনা দাম)</label><input type="number" id="b_factory">
              <label>কোয়ান্টিটি</label><input type="number" id="b_qty" value="1" oninput="calcBill()">
              <label>ডেলিভারি</label><input type="number" id="b_delivery" value="80" oninput="calcBill()">
              <label>অ্যাডভান্স</label><input type="number" id="b_advance" value="0" oninput="calcBill()">
              
-             <button class="main-btn" style="background:#2ecc71;" onclick="saveToHistory()">হিসাবে যোগ করুন & রিসেট</button>
-             <button class="main-btn" style="background:#4f46e5;" onclick="printInvoice()">প্রিন্ট ইনভয়েস (A4 Size)</button>
+             <button class="main-btn" style="background:#2ecc71;" onclick="saveToHistory()">হিসাবে যোগ করুন</button>
+             <button class="main-btn" style="background:#4f46e5;" onclick="printInvoice()">প্রিন্ট ইনভয়েস (PDF)</button>
 
              <div id="billOutput" style="display:none;"><div id="billResult" style="padding:10px; border:1px dashed #777; margin-top:10px; white-space:pre-wrap; background: #fff;"></div></div>
         </div>
-        <div id="calc" class="tab-content" style="display:none;">
+        
+        <div id="calc" style="display:none;">
             <div id="stats" style="background:#e8f5e9; padding:15px; border-radius:8px; margin-bottom: 10px;">
                 <div>মোট বিক্রি: <span id="totalSales">0</span>৳</div>
                 <div style="color: #c0392b;">ফ্যাক্টরি বিল: <span id="totalFactory">0</span>৳</div>
                 <hr>
                 <div style="font-weight: bold; color: #27ae60;">নিট লাভ: <span id="netProfit">0</span>৳</div>
             </div>
-            <button onclick="clearHistory()" style="font-size:10px; background:none; border:none; color:red; cursor:pointer;">হিস্টোরি মুছুন</button>
-            <div id="historyList" style="margin-top:10px; font-size: 12px;"></div>
+            <button onclick="clearHistory()" style="color:red; background:none; border:none; cursor:pointer;">মুছে ফেলুন</button>
+            <div id="historyList"></div>
         </div>
     </div>
 
     <div id="customerForm">
-        <div class="customer-notice">
-            📝 <b>টিম অর্ডার:</b> একাধিক জার্সি হলে 'Add More' বাটনে ক্লিক করে সবার ডিটেইলস লিখুন।
-        </div>
-
-        <div class="section-title">পেমেন্ট ডিটেইলস (বিকাশ/নগদ: 01907966882)</div>
-        <div class="grid">
-            <select id="f_method">
-                <option value="বিকাশ">বিকাশ</option>
-                <option value="নগদ">নগদ</option>
-            </select>
-            <input type="text" id="f_lastDigits" placeholder="লাস্ট ৩ ডিজিট বা নাম">
-        </div>
-        
-        <div class="grid">
-            <input type="text" id="f_name" placeholder="আপনার নাম">
-            <input type="text" id="f_phone" placeholder="ফোন নাম্বার">
-        </div>
-
-        <div class="section-title">ডিজাইন ও সাইজ ডিটেইলস</div>
+        <!-- Customer Details (Existing Code) -->
+        <div class="section-title">অর্ডার ডিটেইলস</div>
+        <input type="text" id="f_name" placeholder="আপনার নাম">
+        <input type="text" id="f_phone" placeholder="ফোন নাম্বার">
         <div id="jerseyContainer">
             <div class="jersey-item">
-                <div class="grid">
-                    <input type="text" class="j_name" placeholder="নাম (Tahsan)">
-                    <input type="text" class="j_num" placeholder="নাম্বার (10)">
-                </div>
-                <div class="grid">
-                    <input type="text" class="j_size" placeholder="সাইজ (M/L/XL)">
-                    <input type="text" class="j_hata" placeholder="হাফ/ফুল হাতা">
-                </div>
+                <input type="text" class="j_name" placeholder="জার্সির নাম ও সাইজ">
             </div>
         </div>
-        <button type="button" onclick="addJerseyField()" style="background:#3498db; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; font-size:12px;">+ Add More Jersey (টিম অর্ডার)</button>
-
-        <div class="section-title">ঠিকানা ও নোট</div>
-        <div class="grid">
-            <input type="text" id="f_dist" placeholder="জেলা">
-            <input type="text" id="f_thana" placeholder="থানা">
-        </div>
-        <input type="text" id="f_area" placeholder="এলাকা/মহল্লা">
-        <textarea id="f_note" placeholder="অতিরিক্ত নোট..." rows="2"></textarea>
-        
-        <button class="main-btn" onclick="submitToWA()">WhatsApp-এ অর্ডার পাঠান 🚀</button>
+        <button class="main-btn" onclick="submitToWA()">WhatsApp-এ অর্ডার পাঠান</button>
     </div>
 </div>
 
-<!-- HIDDEN INVOICE TEMPLATE FOR PRINTING -->
-<div id="invoice-print">
-    <div class="inv-header">
+<!-- INVOICE FOR PRINTING -->
+<div id="invoice-box">
+    <div class="inv-head">
         <div>
-            <h1 style="color:#4f46e5; margin:0;">JERSEY NOVA</h1>
-            <p style="font-size:12px;">যাত্রাবাড়ী, ঢাকা। ফোন: 01907966882</p>
+            <h1 style="margin:0; color:#166534;">JERSEY NOVA</h1>
+            <p>যাত্রাবাড়ী, ঢাকা। ফোন: 01907966882</p>
         </div>
-        <div style="text-align:right">
-            <h2 style="color:#94a3b8; margin:0;">INVOICE</h2>
-            <p id="inv-date" style="font-size:12px;"></p>
+        <div style="text-align:right;">
+            <h2>INVOICE</h2>
+            <p id="inv-date"></p>
         </div>
     </div>
-    
-    <div style="background:#f8fafc; padding:20px; border-radius:10px; margin-bottom:20px;">
-        <h4 style="margin:0; font-size:10px; color:#64748b;">BILL TO:</h4>
-        <h2 id="inv-cust-name" style="margin:5px 0;">CUSTOMER NAME</h2>
+    <div style="margin-top:20px;">
+        <strong>BILL TO:</strong>
+        <p id="inv-cust-name" style="margin:5px 0;"></p>
         <p id="inv-cust-phone" style="margin:0;"></p>
     </div>
-
     <table class="inv-table">
         <thead>
-            <tr><th>ITEM</th><th>QTY</th><th>PRICE</th><th>TOTAL</th></tr>
+            <tr><th>Item Description</th><th>Qty</th><th>Price</th><th>Total</th></tr>
         </thead>
         <tbody>
-            <tr><td>JERSEY (CUSTOMIZED)</td><td id="inv-qty">0</td><td id="inv-price">৳0</td><td id="inv-subtotal">৳0</td></tr>
+            <tr>
+                <td>Premium Customized Jersey</td>
+                <td id="inv-qty"></td>
+                <td id="inv-price"></td>
+                <td id="inv-sub"></td>
+            </tr>
         </tbody>
     </table>
-
-    <div class="inv-total-box">
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Sub-total</span><span id="inv-sub">৳0</span></div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Delivery</span><span id="inv-del">৳0</span></div>
-        <hr>
-        <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>Total</span><span id="inv-total">৳0</span></div>
-        <div style="display:flex; justify-content:space-between; color:green;"><span>Paid</span><span id="inv-paid">-৳0</span></div>
-        <div style="display:flex; justify-content:space-between; color:red; font-weight:bold; margin-top:10px;"><span>Due</span><span id="inv-due">৳0</span></div>
-    </div>
-    
-    <div style="margin-top:100px;">
-        <p class="inv-status">Payment Status: DUE</p>
+    <div class="inv-total">
+        <div class="total-row"><span>Sub-total:</span><span id="sum"></span></div>
+        <div class="total-row"><span>Delivery:</span><span id="del"></span></div>
+        <div class="total-row" style="font-weight:bold; border-top:1px solid #000;"><span>Total:</span><span id="grand"></span></div>
+        <div class="total-row" style="color:green;"><span>Paid:</span><span id="paid"></span></div>
+        <div class="total-row" style="color:red; font-weight:bold;"><span>Due:</span><span id="due"></span></div>
     </div>
 </div>
 
 <script>
-    const MY_PHONE = "8801907966882";
     const PASS = "sahil882";
-
     function showLogin() { document.getElementById('loginSection').style.display = 'block'; }
-
     function checkPassword() {
         if(document.getElementById('passInput').value === PASS) {
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('customerForm').style.display = 'none';
             document.getElementById('loginSection').style.display = 'none';
-        } else { alert("ভুল পাসওয়ার্ড!"); }
+        } else { alert("Wrong Password!"); }
     }
-
     function showTab(t) {
         document.getElementById('bill').style.display = t=='bill'?'block':'none';
         document.getElementById('calc').style.display = t=='calc'?'block':'none';
-        document.getElementById('btn-bill').className = t=='bill'?'nav-btn active':'nav-btn';
-        document.getElementById('btn-calc').className = t=='calc'?'nav-btn active':'nav-btn';
+        document.getElementById('btn-bill').classList.toggle('active', t=='bill');
+        document.getElementById('btn-calc').classList.toggle('active', t=='calc');
     }
 
-    function addJerseyField() {
-        const div = document.createElement('div');
-        div.className = 'jersey-item';
-        div.innerHTML = `<div class="grid"><input type="text" class="j_name" placeholder="নাম"><input type="text" class="j_num" placeholder="নাম্বার"></div><div class="grid"><input type="text" class="j_size" placeholder="সাইজ"><input type="text" class="j_hata" placeholder="হাফ/ফুল হাতা"></div>`;
-        document.getElementById('jerseyContainer').appendChild(div);
-    }
-
-    function submitToWA() {
-        let msg = `📝 *নতুন অর্ডার ফর্ম*\n\n`;
-        msg += `💰 *পেমেন্ট:* ${document.getElementById('f_method').value} (লাস্ট: ${document.getElementById('f_lastDigits').value})\n\n`;
-        msg += `👤 *কাস্টমার:* ${document.getElementById('f_name').value}\n`;
-        msg += `📞 *ফোন:* ${document.getElementById('f_phone').value}\n\n`;
-        
-        msg += `👕 *জার্সি ডিটেইলস:*\n`;
-        const names = document.querySelectorAll('.j_name');
-        const nums = document.querySelectorAll('.j_num');
-        const sizes = document.querySelectorAll('.j_size');
-        const hatas = document.querySelectorAll('.j_hata');
-        
-        names.forEach((n, i) => {
-            if(n.value) msg += `${i+1}. ${n.value}-${nums[i].value}-${sizes[i].value}-${hatas[i].value}\n`;
-        });
-
-        msg += `\n📍 *ঠিকানা:* ${document.getElementById('f_dist').value}, ${document.getElementById('f_thana').value}, ${document.getElementById('f_area').value}\n`;
-        msg += `📝 *নোট:* ${document.getElementById('f_note').value}`;
-        
-        window.open(`https://wa.me/${MY_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    let history = JSON.parse(localStorage.getItem('jn_history_v2') || '[]');
-    
     function calcBill() {
         const p=parseInt(document.getElementById('b_price').value)||0, q=parseInt(document.getElementById('b_qty').value)||1, d=parseInt(document.getElementById('b_delivery').value)||0, a=parseInt(document.getElementById('b_advance').value)||0;
         if(p>0){
             document.getElementById('billOutput').style.display='block'; 
-            document.getElementById('billResult').innerText=`অর্ডার কনফার্ম!\nমোট: ${p*q+d}৳\nঅ্যাডভান্স: ${a}৳\nবাকি: ${p*q+d-a}৳`;
+            document.getElementById('billResult').innerText=`অর্ডার সামারি:\nমোট টাকা: ${p*q+d}৳\nঅ্যাডভান্স: ${a}৳\nবাকি: ${p*q+d-a}৳`;
         }
     }
 
     function printInvoice() {
-        const p=parseInt(document.getElementById('b_price').value)||0;
-        const q=parseInt(document.getElementById('b_qty').value)||1;
-        const d=parseInt(document.getElementById('b_delivery').value)||0;
-        const a=parseInt(document.getElementById('b_advance').value)||0;
+        const name = document.getElementById('b_name').value || "Customer";
+        const phone = document.getElementById('b_phone').value || "N/A";
+        const p=parseInt(document.getElementById('b_price').value)||0, q=parseInt(document.getElementById('b_qty').value)||1, d=parseInt(document.getElementById('b_delivery').value)||0, a=parseInt(document.getElementById('b_advance').value)||0;
 
-        if(p == 0) { alert("প্রাইস না লিখে ইনভয়েস প্রিন্ট করা যাবে না!"); return; }
+        if(p==0) { alert("Please enter price!"); return; }
 
-        // Fill Invoice Data
-        document.getElementById('inv-date').innerText = new Date().toLocaleDateString();
+        document.getElementById('inv-date').innerText = "Date: " + new Date().toLocaleDateString();
+        document.getElementById('inv-cust-name').innerText = name;
+        document.getElementById('inv-cust-phone').innerText = "Phone: " + phone;
         document.getElementById('inv-qty').innerText = q;
         document.getElementById('inv-price').innerText = "৳" + p;
-        document.getElementById('inv-subtotal').innerText = "৳" + (p*q);
         document.getElementById('inv-sub').innerText = "৳" + (p*q);
-        document.getElementById('inv-del').innerText = "৳" + d;
-        document.getElementById('inv-total').innerText = "৳" + (p*q+d);
-        document.getElementById('inv-paid').innerText = "-৳" + a;
-        document.getElementById('inv-due').innerText = "৳" + (p*q+d-a);
+        document.getElementById('sum').innerText = "৳" + (p*q);
+        document.getElementById('del').innerText = "৳" + d;
+        document.getElementById('grand').innerText = "৳" + (p*q+d);
+        document.getElementById('paid').innerText = "৳" + a;
+        document.getElementById('due').innerText = "৳" + (p*q+d-a);
 
         window.print();
     }
 
+    let history = JSON.parse(localStorage.getItem('jn_history_v2') || '[]');
     function saveToHistory() {
-        const p=parseInt(document.getElementById('b_price').value)||0;
-        const f=parseInt(document.getElementById('b_factory').value)||0;
-        const q=parseInt(document.getElementById('b_qty').value)||1;
-        
+        const p=parseInt(document.getElementById('b_price').value)||0, f=parseInt(document.getElementById('b_factory').value)||0, q=parseInt(document.getElementById('b_qty').value)||1;
         if(p>0){
-            history.push({
-                date: new Date().toLocaleDateString(), 
-                sale: p*q, 
-                cost: f*q
-            }); 
-            localStorage.setItem('jn_history_v2', JSON.stringify(history)); 
-            alert("হিসাব সেভ হয়েছে এবং ক্লিয়ার করা হয়েছে!"); 
-            
-            document.getElementById('b_price').value = "";
-            document.getElementById('b_factory').value = "";
-            document.getElementById('b_qty').value = "1";
-            document.getElementById('b_advance').value = "0";
-            document.getElementById('billOutput').style.display = 'none';
-            
+            history.push({ date: new Date().toLocaleDateString(), sale: p*q, cost: f*q });
+            localStorage.setItem('jn_history_v2', JSON.stringify(history));
+            alert("Saved!");
             updateHistory();
         }
     }
 
     function updateHistory() {
-        let totalS=0, totalC=0; 
-        document.getElementById('historyList').innerHTML="";
-        history.forEach(i=>{
-            totalS += i.sale; 
-            totalC += i.cost;
-            document.getElementById('historyList').innerHTML+=`<div>${i.date} - সেল: ${i.sale}৳ (লাভ: ${i.sale - i.cost}৳)</div>`;
-        });
-        document.getElementById('totalSales').innerText = totalS;
-        document.getElementById('totalFactory').innerText = totalC;
-        document.getElementById('netProfit').innerText = (totalS - totalC);
+        let ts=0, tf=0; document.getElementById('historyList').innerHTML="";
+        history.forEach(i => { ts+=i.sale; tf+=i.cost; document.getElementById('historyList').innerHTML+=`<div>${i.date} - ${i.sale}৳</div>`; });
+        document.getElementById('totalSales').innerText=ts; document.getElementById('totalFactory').innerText=tf; document.getElementById('netProfit').innerText=ts-tf;
     }
-
-    function clearHistory() { if(confirm("সব হিসাব মুছে ফেলবেন?")) { history=[]; localStorage.removeItem('jn_history_v2'); updateHistory(); } }
     updateHistory();
+    function clearHistory() { if(confirm("Clear all?")) { history=[]; localStorage.removeItem('jn_history_v2'); updateHistory(); } }
 </script>
 </body>
 </html>
