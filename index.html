@@ -20,6 +20,21 @@
         #adminPanel, #loginSection { display: none; }
         .customer-notice { font-size: 12px; background: #fffbe6; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe58f; }
         .jersey-item { background: #f1f1f1; padding: 10px; border-radius: 8px; margin-bottom: 10px; position: relative; }
+
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #invoice-print, #invoice-print * { visibility: visible; }
+            #invoice-print { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; }
+        }
+
+        #invoice-print { display: none; background: #fff; width: 210mm; min-height: 297mm; padding: 20px; box-sizing: border-box; }
+        .inv-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .inv-table th { background: #0f172a; color: #fff; padding: 10px; text-align: left; }
+        .inv-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .inv-total-box { margin-top: 20px; float: right; width: 200px; background: #f8fafc; padding: 15px; border-radius: 10px; }
+        .inv-status { color: red; font-weight: bold; font-size: 20px; }
     </style>
 </head>
 <body>
@@ -45,7 +60,10 @@
              <label>কোয়ান্টিটি</label><input type="number" id="b_qty" value="1" oninput="calcBill()">
              <label>ডেলিভারি</label><input type="number" id="b_delivery" value="80" oninput="calcBill()">
              <label>অ্যাডভান্স</label><input type="number" id="b_advance" value="0" oninput="calcBill()">
+             
              <button class="main-btn" style="background:#2ecc71;" onclick="saveToHistory()">হিসাবে যোগ করুন & রিসেট</button>
+             <button class="main-btn" style="background:#4f46e5;" onclick="printInvoice()">প্রিন্ট ইনভয়েস (A4 Size)</button>
+
              <div id="billOutput" style="display:none;"><div id="billResult" style="padding:10px; border:1px dashed #777; margin-top:10px; white-space:pre-wrap; background: #fff;"></div></div>
         </div>
         <div id="calc" class="tab-content" style="display:none;">
@@ -103,6 +121,48 @@
         <textarea id="f_note" placeholder="অতিরিক্ত নোট..." rows="2"></textarea>
         
         <button class="main-btn" onclick="submitToWA()">WhatsApp-এ অর্ডার পাঠান 🚀</button>
+    </div>
+</div>
+
+<!-- HIDDEN INVOICE TEMPLATE FOR PRINTING -->
+<div id="invoice-print">
+    <div class="inv-header">
+        <div>
+            <h1 style="color:#4f46e5; margin:0;">JERSEY NOVA</h1>
+            <p style="font-size:12px;">যাত্রাবাড়ী, ঢাকা। ফোন: 01907966882</p>
+        </div>
+        <div style="text-align:right">
+            <h2 style="color:#94a3b8; margin:0;">INVOICE</h2>
+            <p id="inv-date" style="font-size:12px;"></p>
+        </div>
+    </div>
+    
+    <div style="background:#f8fafc; padding:20px; border-radius:10px; margin-bottom:20px;">
+        <h4 style="margin:0; font-size:10px; color:#64748b;">BILL TO:</h4>
+        <h2 id="inv-cust-name" style="margin:5px 0;">CUSTOMER NAME</h2>
+        <p id="inv-cust-phone" style="margin:0;"></p>
+    </div>
+
+    <table class="inv-table">
+        <thead>
+            <tr><th>ITEM</th><th>QTY</th><th>PRICE</th><th>TOTAL</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>JERSEY (CUSTOMIZED)</td><td id="inv-qty">0</td><td id="inv-price">৳0</td><td id="inv-subtotal">৳0</td></tr>
+        </tbody>
+    </table>
+
+    <div class="inv-total-box">
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Sub-total</span><span id="inv-sub">৳0</span></div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Delivery</span><span id="inv-del">৳0</span></div>
+        <hr>
+        <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>Total</span><span id="inv-total">৳0</span></div>
+        <div style="display:flex; justify-content:space-between; color:green;"><span>Paid</span><span id="inv-paid">-৳0</span></div>
+        <div style="display:flex; justify-content:space-between; color:red; font-weight:bold; margin-top:10px;"><span>Due</span><span id="inv-due">৳0</span></div>
+    </div>
+    
+    <div style="margin-top:100px;">
+        <p class="inv-status">Payment Status: DUE</p>
     </div>
 </div>
 
@@ -166,6 +226,28 @@
         }
     }
 
+    function printInvoice() {
+        const p=parseInt(document.getElementById('b_price').value)||0;
+        const q=parseInt(document.getElementById('b_qty').value)||1;
+        const d=parseInt(document.getElementById('b_delivery').value)||0;
+        const a=parseInt(document.getElementById('b_advance').value)||0;
+
+        if(p == 0) { alert("প্রাইস না লিখে ইনভয়েস প্রিন্ট করা যাবে না!"); return; }
+
+        // Fill Invoice Data
+        document.getElementById('inv-date').innerText = new Date().toLocaleDateString();
+        document.getElementById('inv-qty').innerText = q;
+        document.getElementById('inv-price').innerText = "৳" + p;
+        document.getElementById('inv-subtotal').innerText = "৳" + (p*q);
+        document.getElementById('inv-sub').innerText = "৳" + (p*q);
+        document.getElementById('inv-del').innerText = "৳" + d;
+        document.getElementById('inv-total').innerText = "৳" + (p*q+d);
+        document.getElementById('inv-paid').innerText = "-৳" + a;
+        document.getElementById('inv-due').innerText = "৳" + (p*q+d-a);
+
+        window.print();
+    }
+
     function saveToHistory() {
         const p=parseInt(document.getElementById('b_price').value)||0;
         const f=parseInt(document.getElementById('b_factory').value)||0;
@@ -180,7 +262,6 @@
             localStorage.setItem('jn_history_v2', JSON.stringify(history)); 
             alert("হিসাব সেভ হয়েছে এবং ক্লিয়ার করা হয়েছে!"); 
             
-            // ফিল্ড রিসেট করা
             document.getElementById('b_price').value = "";
             document.getElementById('b_factory').value = "";
             document.getElementById('b_qty').value = "1";
@@ -205,7 +286,6 @@
     }
 
     function clearHistory() { if(confirm("সব হিসাব মুছে ফেলবেন?")) { history=[]; localStorage.removeItem('jn_history_v2'); updateHistory(); } }
-    
     updateHistory();
 </script>
 </body>
