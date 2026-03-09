@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Code Generator</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
+padding-top:80px;
+}
+
+.box{
+background:#1e293b;
+padding:30px;
+border-radius:12px;
+max-width:350px;
+margin:auto;
+box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+
+input{
+width:90%;
+padding:12px;
+margin:10px 0;
+border-radius:6px;
+border:none;
+}
+
+button{
+padding:12px 20px;
+background:#22c55e;
+border:none;
+border-radius:6px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#16a34a;
+}
+
+#panel{
+display:none;
+}
+
+.code{
+background:black;
+padding:15px;
+margin-top:15px;
+border-radius:6px;
+font-size:18px;
+letter-spacing:2px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box" id="login">
+
+<h2>Admin Access</h2>
+
+<input type="password" id="pass" placeholder="Enter Admin Password">
+
+<br>
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
+</div>
+
+
+<div class="box" id="panel">
+
+<h2>Generate Code</h2>
+
+<button onclick="generate()">Generate Code</button>
+
+<div class="code">
+<span id="code">--------</span>
+</div>
+
+<br>
+
+<button onclick="copy()">Copy Code</button>
+
+</div>
+
+
+<script>
+
+var adminPass="sahil882"
+
+function login(){
+
+var p=document.getElementById("pass").value
+
+if(p===adminPass){
+
+document.getElementById("login").style.display="none"
+document.getElementById("panel").style.display="block"
+
+}else{
+
+document.getElementById("msg").innerText="Wrong Password"
+
+}
+
+}
+
+function generate(){
+
+var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var code=""
+
+for(var i=0;i<8;i++){
+
+code+=chars.charAt(Math.floor(Math.random()*chars.length))
+
+}
+
+document.getElementById("code").innerText=code
+
+}
+
+function copy(){
+
+var text=document.getElementById("code").innerText
+
+navigator.clipboard.writeText(text)
+
+alert("Code Copied")
+
+}
+
+</script>
+
+</body>
+</html>
